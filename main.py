@@ -60,21 +60,26 @@ def calcular(fator_1, fator_2, simbolo):
 
     return resultado
 
-ultimo_resultado = None
+def main():
+    ultimo_resultado = None
 
-while True:
-    fator_1, fator_2, simbolo = coletar_dados(ultimo_resultado)
-    resultado = calcular(fator_1, fator_2, simbolo)
+    while True:
+        fator_1, fator_2, simbolo = coletar_dados(ultimo_resultado)
+        resultado = calcular(fator_1, fator_2, simbolo)
 
-    if resultado is None:
-        continue
-    print(f"resultado: {resultado}")
-    ultimo_resultado = resultado
+        if resultado is None:
+            continue
+        print(f"resultado: {resultado}")
+        ultimo_resultado = resultado
 
-    continuar = input("continuar calculando? (s/n) ou reset(r): ").strip().lower()
-    if continuar == "r":
-        ultimo_resultado = None
-        print("memoria resetada")
-        continue
-    if continuar != "s":
-        break
+        continuar = input("continuar calculando? (s/n) ou reset(r): ").strip().lower()
+        if continuar == "r":
+            ultimo_resultado = None
+            print("memoria resetada")
+            continue
+        if continuar != "s":
+            break
+
+
+if __name__ == "__main__":
+    main()
