@@ -44,6 +44,48 @@ class TestCalcular(unittest.TestCase):
 
 
 class TestColetarDados(unittest.TestCase):
+    def test_decimais_com_ponto_e_espacos(self):
+        with patch("builtins.input", side_effect=[" 2.5 ", " -1.5 ", "+", "0", "0", "+"]):
+            with contextlib.redirect_stdout(io.StringIO()) as saida:
+                dados = main.coletar_dados(None)
+        self.assertEqual(dados, (2.5, -1.5, "+"))
+        self.assertEqual(main.calcular(*dados), 1.0)
+        self.assertEqual(saida.getvalue(), "")
+
+    def test_decimais_com_virgula_nos_dois_operandos(self):
+        with patch("builtins.input", side_effect=[" 2,5 ", " -1,5 ", "+", "0", "0", "+"]):
+            with contextlib.redirect_stdout(io.StringIO()) as saida:
+                dados = main.coletar_dados(None)
+        self.assertEqual(dados, (2.5, -1.5, "+"))
+        self.assertEqual(main.calcular(*dados), 1.0)
+        self.assertEqual(saida.getvalue(), "")
+
+    def test_inteiros_com_espacos(self):
+        with patch("builtins.input", side_effect=[" 2 ", " -3 ", " + "]):
+            self.assertEqual(main.coletar_dados(None), (2, -3, "+"))
+
+    def test_entrada_invalida_seguida_de_decimal(self):
+        for entradas in (
+            ["abc", "1.5", "+", " 2,5 ", "1.5", "+"],
+            ["2,5", "abc", "+", " 2,5 ", "1.5", "+"],
+            ["2,5", "1,2.3", "+", " 2,5 ", "1.5", "+"],
+        ):
+            with self.subTest(entradas=entradas):
+                with patch("builtins.input", side_effect=entradas):
+                    with contextlib.redirect_stdout(io.StringIO()) as saida:
+                        dados = main.coletar_dados(None)
+                self.assertEqual(dados, (2.5, 1.5, "+"))
+                self.assertEqual(main.calcular(*dados), 4.0)
+                self.assertEqual(saida.getvalue(), "insira numeros inteiros\n")
+
+    def test_memoria_com_segundo_operando_decimal(self):
+        with patch("builtins.input", side_effect=["s", " 1,5 ", "+"]):
+            with contextlib.redirect_stdout(io.StringIO()) as saida:
+                dados = main.coletar_dados(2.5)
+        self.assertEqual(dados, (2.5, 1.5, "+"))
+        self.assertEqual(main.calcular(*dados), 4.0)
+        self.assertEqual(saida.getvalue(), "ultimo resultado: 2.5\n")
+
     def test_entrada_valida(self):
         with patch("builtins.input", side_effect=["2", "3", "+"]):
             self.assertEqual(main.coletar_dados(None), (2, 3, "+"))

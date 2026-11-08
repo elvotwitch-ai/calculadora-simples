@@ -27,9 +27,9 @@ def coletar_dados(ultimo_resultado):
 
         try:
             if not usando_memoria and fator_1_texto:
-                fator_1 = int(fator_1_texto)
+                fator_1 = float(fator_1_texto.replace(",", "."))
 
-            fator_2 = int(fator_2_texto)
+            fator_2 = float(fator_2_texto.replace(",", "."))
         except ValueError:
             print("insira numeros inteiros")
             continue
