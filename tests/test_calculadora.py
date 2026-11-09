@@ -36,6 +36,16 @@ class TestCalculadora(unittest.TestCase):
                 self.assertIsNone(calculadora.calcular(7, 0, "/"))
                 self.assertIsNone(calculadora.calcular(0, 0, "/"))
 
+    def test_potencia_sem_entrada_saida_nem_mutacao_global(self):
+        estado = vars(calculadora).copy()
+        casos = ((2, 3, 8), (5, 0, 1), (2, -3, 0.125), (-2, 3, -8), (9, 0.5, 3))
+        with patch("builtins.input", side_effect=AssertionError("entrada indevida")):
+            with patch("builtins.print", side_effect=AssertionError("saída indevida")):
+                for base, expoente, esperado in casos:
+                    with self.subTest(base=base, expoente=expoente):
+                        self.assertEqual(calculadora.calcular(base, expoente, "**"), esperado)
+        self.assertEqual(vars(calculadora), estado)
+
     def test_simbolo_invalido(self):
         for simbolo in ("", "%", "potencia"):
             with self.subTest(simbolo=simbolo):
