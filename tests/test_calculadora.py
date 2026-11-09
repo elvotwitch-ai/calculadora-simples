@@ -46,6 +46,34 @@ class TestCalculadora(unittest.TestCase):
                         self.assertEqual(calculadora.calcular(base, expoente, "**"), esperado)
         self.assertEqual(vars(calculadora), estado)
 
+    def test_raiz_positiva_ignora_segundo_operando(self):
+        for radicando, esperado in ((9, 3), (2, 2 ** 0.5), (0.25, 0.5)):
+            with self.subTest(radicando=radicando):
+                resultado = calculadora.calcular(radicando, object(), "raiz")
+                assert isinstance(resultado, float)
+                self.assertAlmostEqual(resultado, float(esperado))
+
+    def test_raiz_negativa_gera_value_error(self):
+        for radicando in (-1, -0.25):
+            with self.subTest(radicando=radicando):
+                with self.assertRaisesRegex(ValueError, "radicando negativo"):
+                    calculadora.calcular(radicando, None, "raiz")
+
+    def test_raiz_zero(self):
+        self.assertEqual(calculadora.calcular(0, None, "raiz"), 0)
+
+    def test_raiz_sem_entrada_saida_nem_mutacao_global(self):
+        estado = vars(calculadora).copy()
+        with patch("builtins.input", side_effect=AssertionError("entrada indevida")):
+            with patch("builtins.print", side_effect=AssertionError("saída indevida")):
+                for radicando, esperado in ((9, 3), (0, 0)):
+                    with self.subTest(radicando=radicando):
+                        self.assertEqual(calculadora.calcular(radicando, None, "raiz"), esperado)
+                        self.assertEqual(calculadora.calcular(radicando, None, "raiz"), esperado)
+                with self.assertRaises(ValueError):
+                    calculadora.calcular(-1, None, "raiz")
+        self.assertEqual(vars(calculadora), estado)
+
     def test_simbolo_invalido(self):
         for simbolo in ("", "%", "potencia"):
             with self.subTest(simbolo=simbolo):
