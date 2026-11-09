@@ -74,8 +74,36 @@ class TestCalculadora(unittest.TestCase):
                     calculadora.calcular(-1, None, "raiz")
         self.assertEqual(vars(calculadora), estado)
 
+    def test_porcentagem_positiva(self):
+        self.assertEqual(calculadora.calcular(20, 15, "%"), 3)
+
+    def test_porcentagem_fracionaria(self):
+        resultado = calculadora.calcular(12.5, 2.5, "%")
+        assert isinstance(resultado, float)
+        self.assertAlmostEqual(resultado, 0.3125)
+
+    def test_porcentagem_zero(self):
+        for fator_1, fator_2 in ((20, 0), (0, 15), (0, 0)):
+            with self.subTest(fator_1=fator_1, fator_2=fator_2):
+                self.assertEqual(calculadora.calcular(fator_1, fator_2, "%"), 0)
+
+    def test_porcentagem_negativa(self):
+        for fator_1, fator_2, esperado in ((20, -15, -3), (-20, 15, -3), (-20, -15, 3)):
+            with self.subTest(fator_1=fator_1, fator_2=fator_2):
+                self.assertEqual(calculadora.calcular(fator_1, fator_2, "%"), esperado)
+
+    def test_porcentagem_sem_entrada_saida_nem_mutacao_global(self):
+        estado = vars(calculadora).copy()
+        with patch("builtins.input", side_effect=AssertionError("entrada indevida")):
+            with patch("builtins.print", side_effect=AssertionError("saída indevida")):
+                for fator_1, fator_2, esperado in ((20, 15, 3), (20, 0, 0), (20, -15, -3)):
+                    with self.subTest(fator_1=fator_1, fator_2=fator_2):
+                        self.assertEqual(calculadora.calcular(fator_1, fator_2, "%"), esperado)
+                        self.assertEqual(calculadora.calcular(fator_1, fator_2, "%"), esperado)
+        self.assertEqual(vars(calculadora), estado)
+
     def test_simbolo_invalido(self):
-        for simbolo in ("", "%", "potencia"):
+        for simbolo in ("", "modulo", "potencia"):
             with self.subTest(simbolo=simbolo):
                 with self.assertRaisesRegex(ValueError, "Operação inválida"):
                     calculadora.calcular(2, 3, simbolo)
@@ -90,7 +118,7 @@ class TestCalculadora(unittest.TestCase):
                         self.assertEqual(calculadora.calcular(6, 3, simbolo), esperado)
                 self.assertIsNone(calculadora.calcular(6, 0, "/"))
                 with self.assertRaises(ValueError):
-                    calculadora.calcular(6, 3, "%")
+                    calculadora.calcular(6, 3, "modulo")
         self.assertEqual(vars(calculadora), estado)
 
 

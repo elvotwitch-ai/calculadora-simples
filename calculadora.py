@@ -4,10 +4,11 @@
 def calcular(fator_1, fator_2, simbolo):
     """Calcula dois operandos numéricos sem entrada/saída nem estado global.
 
-    Aceita +, -, *, /, ** e raiz. Divisão por zero retorna None, como na
+    Aceita +, -, *, /, **, raiz e %. Divisão por zero retorna None, como na
     interface existente, mas sem imprimir mensagem. Símbolo inválido gera
     ValueError. Para raiz quadrada, usa fator_1 e ignora fator_2; radicando
-    negativo gera ValueError, sem produzir resultado complexo.
+    negativo gera ValueError, sem produzir resultado complexo. Porcentagem
+    (%) calcula fator_1 * fator_2 / 100, não o resto da divisão.
     """
     if simbolo == "+":
         return fator_1 + fator_2
@@ -25,4 +26,6 @@ def calcular(fator_1, fator_2, simbolo):
         if fator_1 < 0:
             raise ValueError("Raiz quadrada não aceita radicando negativo.")
         return fator_1 ** 0.5
-    raise ValueError("Operação inválida: use +, -, *, /, ** ou raiz.")
+    if simbolo == "%":
+        return fator_1 * fator_2 / 100
+    raise ValueError("Operação inválida: use +, -, *, /, **, raiz ou %.")
